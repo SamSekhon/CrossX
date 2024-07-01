@@ -6,6 +6,7 @@ from langchain_community.vectorstores import FAISS
 import uuid
 import numpy as np
 import pickle
+from langchain_community.retrievers import BM25Retriever
 
 # Import the read module
 from read import read
@@ -38,7 +39,21 @@ def create_new_collection_streamlit(collection_name_str=None, pdf_file=None):
 
     db.save_local(f"faiss/{collection_name_str}")
 
-    return db
+    return db, splits
+
+
+def load_BM25Retriever(filepath):
+
+
+    # Load the document and split it into chunks
+    # loader = TextLoader(f'{filepath}.txt')
+    loader = TextLoader(f"data/{filepath}")
+    documents = loader.load()
+
+    # Apply the text splitter to the documents
+    splits = text_splitter.split_documents(documents)
+
+    return BM25Retriever.from_documents(splits)   
 
 
 def load_vector_store(collection_name_str=None):

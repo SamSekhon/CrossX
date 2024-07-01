@@ -272,3 +272,4 @@ yarg==0.1.9
 yarl==1.9.4
 zipp==3.18.1
 audio_recorder_streamlit
+rank_bm25

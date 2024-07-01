@@ -20,6 +20,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.messages import HumanMessage
+from langchain_community.retrievers import BM25Retriever
 
 # Import code modules
 from transcribe_voice_openai import *
@@ -131,6 +132,43 @@ def initialize_question_answer_chain(llm, qa_prompt):
     """
     return create_stuff_documents_chain(llm, qa_prompt)
 
+def initialize_BM25Retriever():
+    """
+    Initialize the vector database by allowing the user to select an existing collection or create a new one.
+    
+    Output:
+        vectordb (VectorDatabase or None): Initialized VectorDatabase object or None if not created
+    """
+    # Define the directory where the FAISS indexes are stored
+    index_directory = 'data/'
+
+    # List all files in the directory
+    files = os.listdir(index_directory)
+
+    # Filter the list to only include files that match your index naming pattern
+    collection_list = [file for file in files if file.endswith('.txt')]
+
+    # collection_list = [i.name for i in list(chroma_client.list_collections())]
+    collection_list.append("Create new collection")
+
+    collection_name_str = st.selectbox('Select a collection or create a new one:', collection_list)
+
+    if collection_name_str == "Create new collection":
+        new_collection_name = st.text_input("Enter a new collection name")
+        uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
+
+        if st.button('Submit'):
+            if new_collection_name and uploaded_file is not None:
+                with open(os.path.join(os.getcwd(), new_collection_name + '.pdf'), 'wb') as f:
+                    f.write(uploaded_file.getvalue())
+
+                db, splits = create_new_collection_streamlit(collection_name_str=new_collection_name, 
+                                                             pdf_file=new_collection_name)\
+                                                             
+                return BM25Retriever.from_documents(splits)                                            
+    else:
+        return load_BM25Retriever(collection_name_str)
+
 def initialize_vectordb():
     """
     Initialize the vector database by allowing the user to select an existing collection or create a new one.
@@ -165,7 +203,7 @@ def initialize_vectordb():
     else:
         return load_vector_store(collection_name_str=collection_name_str)
 
-def run_chatbot(client, llm, vectordb, contextualize_q_prompt, question_answer_chain, voice_key, audio_bytes):
+def run_chatbot(client, llm, retriever, contextualize_q_prompt, question_answer_chain, voice_key, audio_bytes):
     """
     Run the chatbot, handling user input and generating responses.
     
@@ -179,8 +217,8 @@ def run_chatbot(client, llm, vectordb, contextualize_q_prompt, question_answer_c
     Output:
         None
     """
-    if vectordb is not None:
-        retriever = vectordb.as_retriever()
+    if retriever is not None:
+        # retriever = vectordb.as_retriever()
         history_aware_retriever = create_history_aware_retriever(llm, retriever, contextualize_q_prompt)
         rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
         chat_history = []
@@ -249,9 +287,10 @@ def main():
 
     question_answer_chain = initialize_question_answer_chain(llm, qa_prompt)
 
-    vectordb = initialize_vectordb()
+    # vectordb = initialize_vectordb()
+    retriever = initialize_BM25Retriever()
 
-    run_chatbot(client, llm, vectordb, contextualize_q_prompt, question_answer_chain, voice_key, audio_bytes)
+    run_chatbot(client, llm, retriever, contextualize_q_prompt, question_answer_chain, voice_key, audio_bytes)
 
 if __name__ == '__main__':
     main()
