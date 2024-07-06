@@ -4,7 +4,7 @@ crossX is a comprehensive toolset designed to aid lawyers in preparation and emp
 
 ## Project Overview
 
-CrossX is a Streamlit app designed to facilitate the cross-examination process through LLMs. It incorporates PyTesseract for text extraction, and utilizes OpenAI Whisper for text-to-speech and speech-to-text functionalities. Additionally, it employs chroma vector operations for storing and querying embeddings.
+CrossX is a Streamlit app designed to facilitate the cross-examination process through LLMs. It incorporates PyTesseract for text extraction, and utilizes OpenAI Whisper for text-to-speech and speech-to-text functionalities. Additionally, it employs Faiss vector operations for storing and querying embeddings.
 
 The app features a chatbot built with large language models (LLMs) and a Retrieval-Augmented Generation (RAG) approach, implemented using the LangChain framework. This setup includes a history-aware retriever to enhance context relevance. Users can upload their own interviews or depositions in PDF format, or use the two pre-loaded depositions for practice.
 
@@ -27,7 +27,7 @@ The app features a chatbot built with large language models (LLMs) and a Retriev
 
 - **transcribe_voice_openai.py**: Module for converting text to speech and speech to text, facilitating the practice and analysis of verbal arguments.
 
-- **vector_store.py**: Includes utilities for processing and analyzing chroma vectors, useful for audio and visual data analysis in courtroom scenarios.
+- **vector_store.py**: Includes utilities for processing and analyzing Faiss vectors, useful for audio and visual data analysis in courtroom scenarios.
 
 ## Installation
 
@@ -58,7 +58,7 @@ Launch the crossX platform to access and utilize various tools for cross-examina
 
 3. **Speech Analysis**: Use `transcribe_voice_openai.py` for converting speech to text and vice versa, facilitating practice sessions for verbal arguments.
 
-4. **Chroma Vector Operations**: Refer to `vector_store.py` for tools and utilities related to chroma vector operations.
+4. **Vector Operations**: Refer to `vector_store.py` for tools and utilities related to vector operations.
 
 ## Future Works
 
